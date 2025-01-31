@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sunshine Dino & Seal</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #FFF;
+        }
+        canvas {
+            display: block;
+            background-color: #F1F1F1;
+        }
+        h1 {
+            position: absolute;
+            color: white;
+            font-size: 70px;
+            text-align: center;
+            margin: 0;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dino loves Seal!!!</h1>
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        // Set up canvas and context
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Colors
+        const PINK = "#FF69B4";
+        const DARK_PINK = "#FF1493";
+        const WHITE = "#FFFFFF";
+        const GOLD = "#FFD700";
+
+        // Load images (replace with paths to your images)
+        const dinoImage = new Image();
+        dinoImage.src = 'assets/images/dino.webp'; // Replace with your local path
+        const backgroundImage = new Image();
+        backgroundImage.src = 'assets/images/seal.png'; // Replace with your local path
+
+        // Heart function
+        function heartFunction(t) {
+            const x = 16 * Math.sin(t) ** 3;
+            const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+            return {
+                x: x * 20 + canvas.width / 2,
+                y: -y * 20 + canvas.height / 2
+            };
+        }
+
+        // Generate heart points
+        const heartPoints = [];
+        for (let t = 0; t < Math.PI * 2; t += 0.1) {
+            heartPoints.push(heartFunction(t));
+        }
+
+        // Dino positions and indexes
+        const dinos = Array(50).fill({ x: -40, y: -40 });
+        const indexes = Array.from({ length: 50 }, () => Math.floor(Math.random() * heartPoints.length));
+
+        // Rotation angle for text
+        let angle = 0;
+
+        // Render rotating text with shadow and outline
+        function render3DText(text, x, y, angle) {
+            ctx.font = '70px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // Draw text shadow
+            ctx.fillStyle = DARK_PINK;
+            for (let i = 5; i > 0; i--) {
+                ctx.fillText(text, x + i, y + i);
+            }
+
+            // Draw text outline
+            ctx.fillStyle = GOLD;
+            for (let dx of [-3, 0, 3]) {
+                for (let dy of [-3, 0, 3]) {
+                    if (dx !== 0 || dy !== 0) {
+                        ctx.fillText(text, x + dx, y + dy);
+                    }
+                }
+            }
+
+            // Draw main text
+            ctx.fillStyle = WHITE;
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle * Math.PI / 180);
+            ctx.fillText(text, 0, 0);
+            ctx.restore();
+        }
+
+        // Main animation loop
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+
+            // Rotate and render text
+            render3DText("Dino loves Seal!!!", canvas.width / 2, canvas.height / 2, angle);
+            angle -= 5;
+
+            // Draw dinosaurs along heart shape
+            dinos.forEach((dino, i) => {
+                dinos[i] = heartPoints[indexes[i]];
+                ctx.drawImage(dinoImage, dinos[i].x - 20, dinos[i].y - 20, 40, 40);
+                indexes[i] = (indexes[i] + 1) % heartPoints.length;
+            });
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Start the game loop when images are loaded
+        backgroundImage.onload = () => {
+            dinoImage.onload = () => {
+                gameLoop();
+            };
+        };
+    </script>
+</body>
+</html>
