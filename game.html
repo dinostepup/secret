@@ -76,65 +76,39 @@
     let gameStarted = false;
     let gameOver = false;
 
-   // Declare variables for interval tracking
-let moveCharacterLeft = null;
-let moveCharacterRight = null;
-
-function startMovingLeft() {
-  // Clear any existing intervals to avoid multiple intervals running at the same time
-  if (moveCharacterLeft) clearInterval(moveCharacterLeft);
-  if (moveCharacterRight) clearInterval(moveCharacterRight); // Stop right movement if left is pressed
-  moveCharacterLeft = setInterval(function () {
-    if (character.x > 0) {
-      character.x -= character.speed;
+    // Declare variables for interval tracking
+    let moveCharacterLeft = null;
+    let moveCharacterRight = null;
+    
+    function startMovingLeft() {
+      // Clear any existing intervals to avoid multiple intervals running at the same time
+      if (moveCharacterLeft) clearInterval(moveCharacterLeft);
+      if (moveCharacterRight) clearInterval(moveCharacterRight); // Stop right movement if left is pressed
+      moveCharacterLeft = setInterval(function () {
+        if (character.x > 0) {
+          character.x -= character.speed;
+        }
+      }, 100); // Adjust movement speed
     }
-  }, 100); // Adjust movement speed
-}
-
-function startMovingRight() {
-  // Clear any existing intervals to avoid multiple intervals running at the same time
-  if (moveCharacterLeft) clearInterval(moveCharacterLeft); // Stop left movement if right is pressed
-  if (moveCharacterRight) clearInterval(moveCharacterRight);
-  moveCharacterRight = setInterval(function () {
-    if (character.x < width - character.width) {
-      character.x += character.speed;
+    
+    function startMovingRight() {
+      // Clear any existing intervals to avoid multiple intervals running at the same time
+      if (moveCharacterLeft) clearInterval(moveCharacterLeft); // Stop left movement if right is pressed
+      if (moveCharacterRight) clearInterval(moveCharacterRight);
+      moveCharacterRight = setInterval(function () {
+        if (character.x < width - character.width) {
+          character.x += character.speed;
+        }
+      }, 100); // Adjust movement speed
     }
-  }, 100); // Adjust movement speed
-}
 
-function stopMoving() {
-  // Clear any existing movement intervals
-  clearInterval(moveCharacterLeft);
-  clearInterval(moveCharacterRight);
-  moveCharacterLeft = null;
-  moveCharacterRight = null;
-}
-
-// Event listeners for button presses
-document.getElementById("leftBtn").addEventListener("mousedown", startMovingLeft);
-document.getElementById("leftBtn").addEventListener("touchstart", startMovingLeft); // Mobile support
-document.getElementById("leftBtn").addEventListener("mouseup", stopMoving);
-document.getElementById("leftBtn").addEventListener("mouseleave", stopMoving);
-document.getElementById("leftBtn").addEventListener("touchend", stopMoving);
-
-document.getElementById("rightBtn").addEventListener("mousedown", startMovingRight);
-document.getElementById("rightBtn").addEventListener("touchstart", startMovingRight); // Mobile support
-document.getElementById("rightBtn").addEventListener("mouseup", stopMoving);
-document.getElementById("rightBtn").addEventListener("mouseleave", stopMoving);
-document.getElementById("rightBtn").addEventListener("touchend", stopMoving);
-
-// Ensure no movement when keyboard keys are released
-document.addEventListener("keyup", stopMoving);
-
-// Event listeners for key presses
-document.addEventListener("keydown", function (event) {
-  if (event.key === "ArrowLeft" && character.x > 0) {
-    character.x -= character.speed;
-  }
-  if (event.key === "ArrowRight" && character.x < width - character.width) {
-    character.x += character.speed;
-  }
-});
+    function stopMoving() {
+      // Clear any existing movement intervals
+      clearInterval(moveCharacterLeft);
+      clearInterval(moveCharacterRight);
+      moveCharacterLeft = null;
+      moveCharacterRight = null;
+    }
     const characterImg = new Image();
     const moneyImg = new Image();
     const backgroundImg = new Image();
