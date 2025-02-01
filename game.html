@@ -41,6 +41,7 @@
       height: 120px;
       cursor: pointer;
       bottom: 100px; /* Adjust the distance from the bottom */
+      z-index: 15; /* Ensure buttons appear on top */
     }
     #leftBtn {
       left: 10px; /* Adjust the distance from the left */
@@ -72,8 +73,9 @@
   <div id="buttons">
     <img id="restart" src="https://i.imgur.com/Ulh6dNe.png" alt="Restart" />
     <img id="exit" src="https://i.imgur.com/9ih3oqp.png" alt="Exit" />
+  </div>
 
-<!-- Added Left and Right Buttons with Overlay to prevent image save option -->
+  <!-- Added Left and Right Buttons with Overlay to prevent image save option -->
   <div class="button-container">
     <!-- Overlay div to block right-click but allow button interaction -->
     <div class="overlay"></div>
@@ -163,6 +165,7 @@
       clearInterval(moveCharacterLeft);
       clearInterval(moveCharacterRight);
     }
+    
     const characterImg = new Image();
     const moneyImg = new Image();
     const backgroundImg = new Image();
