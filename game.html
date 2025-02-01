@@ -63,19 +63,24 @@
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
-
+    
     const width = 400;
     const height = 700;
     canvas.width = width;
     canvas.height = height;
-
-    let character = { x: width / 2 - 25, y: height - 100, width: 100, height: 100, speed: 30 };
+    
+    let character = { x: width / 2 - 25, y: height - 100, width: 100, height: 100 };
+    
+    // Speed for different input methods
+    let keyboardSpeed = 50;  // Speed when using keyboard
+    let buttonSpeed = 50;    // Speed when using mobile buttons (adjust to suit your game)
+    
     let money = [];
     let score = 0;
     let hearts = 5;
     let gameStarted = false;
     let gameOver = false;
-
+    
     // Declare movement interval variables
     let moveLeft = false;
     let moveRight = false;
@@ -83,7 +88,7 @@
     let moveCharacterLeft, moveCharacterRight; // To handle mobile movement separately
     
     // Listen for keyboard events
-        document.addEventListener("keydown", (event) => {
+    document.addEventListener("keydown", (event) => {
       if (event.key === "ArrowLeft" || event.key === "a") {
         moveLeft = true;
       } else if (event.key === "ArrowRight" || event.key === "d") {
@@ -117,7 +122,7 @@
       stopMoving(); // Ensure no conflicting movement
       moveCharacterLeft = setInterval(function () {
         if (character.x > 0) {
-          character.x -= character.speed;
+          character.x -= buttonSpeed; // Use buttonSpeed for mobile button movement
         }
       }, 100);
     }
@@ -126,7 +131,7 @@
       stopMoving(); // Ensure no conflicting movement
       moveCharacterRight = setInterval(function () {
         if (character.x < width - character.width) {
-          character.x += character.speed;
+          character.x += buttonSpeed; // Use buttonSpeed for mobile button movement
         }
       }, 100);
     }
@@ -135,7 +140,6 @@
       clearInterval(moveCharacterLeft);
       clearInterval(moveCharacterRight);
     }
-
     const characterImg = new Image();
     const moneyImg = new Image();
     const backgroundImg = new Image();
@@ -275,10 +279,10 @@
     
       // Move character based on keyboard input
       if (moveLeft && character.x > 0) {
-        character.x -= character.speed;
+        character.x -= keyboardSpeed; // Use keyboardSpeed for keyboard input
       }
       if (moveRight && character.x < width - character.width) {
-        character.x += character.speed;
+        character.x += keyboardSpeed; // Use keyboardSpeed for keyboard input
       }
     
       for (let i = 0; i < money.length; i++) {
