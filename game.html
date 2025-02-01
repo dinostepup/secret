@@ -1,318 +1,330 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catch me if you can!</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: transparent;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-            position: relative;
-        }
-        canvas {
-            border: 2px solid white;
-        }
-        #buttons {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            display: none; /* Initially hidden */
-            gap: 5px;
-            z-index: 10;
-            margin-top: 20px; /* Adjust this if needed */
-        }
-        #restart, #exit {
-            width: 150px; /* Adjust the size */
-            height: 150px;
-            cursor: pointer;
-        }
-        #leftBtn, #rightBtn {
-            position: fixed; /* Make sure the buttons are fixed to the viewport */
-            width: 120px;
-            height: 120px;
-            cursor: pointer;
-            bottom: 100px; /* Adjust the distance from the bottom */
-        }
-
-        #leftBtn {
-            left: 90px; /* Adjust the distance from the left */
-        }
-
-        #rightBtn {
-            right: 90px; /* Adjust the distance from the right */
-        }
-
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Catch me if you can!</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: transparent;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      /* Prevent default touch actions on the body */
+      touch-action: none;
+    }
+    canvas {
+      border: 2px solid white;
+      /* Disable gestures on the canvas */
+      touch-action: none;
+    }
+    #buttons {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none; /* Initially hidden */
+      gap: 5px;
+      z-index: 10;
+      margin-top: 20px; /* Adjust this if needed */
+    }
+    #restart, #exit {
+      width: 150px; /* Adjust the size */
+      height: 150px;
+      cursor: pointer;
+    }
+    #leftBtn, #rightBtn {
+      position: fixed; /* Make sure the buttons are fixed to the viewport */
+      width: 120px;
+      height: 120px;
+      cursor: pointer;
+      bottom: 100px; /* Adjust the distance from the bottom */
+    }
+    #leftBtn {
+      left: 90px; /* Adjust the distance from the left */
+    }
+    #rightBtn {
+      right: 90px; /* Adjust the distance from the right */
+    }
+  </style>
 </head>
 <body>
-    <canvas id="gameCanvas"></canvas>
-    <div id="buttons">
-        <img id="restart" src="https://i.imgur.com/Ulh6dNe.png" alt="Restart">
-        <img id="exit" src="https://i.imgur.com/9ih3oqp.png" alt="Exit">
-    </div>
-    <!-- Added Left and Right Buttons -->
-    <img id="leftBtn" src="https://i.imgur.com/iAYThAE.png" alt="Move Left">
-    <img id="rightBtn" src="https://i.imgur.com/BHAtUSb.png" alt="Move Right">
+  <canvas id="gameCanvas"></canvas>
+  <div id="buttons">
+    <img id="restart" src="https://i.imgur.com/Ulh6dNe.png" alt="Restart">
+    <img id="exit" src="https://i.imgur.com/9ih3oqp.png" alt="Exit">
+  </div>
+  <!-- Added Left and Right Buttons -->
+  <img id="leftBtn" src="https://i.imgur.com/iAYThAE.png" alt="Move Left">
+  <img id="rightBtn" src="https://i.imgur.com/BHAtUSb.png" alt="Move Right">
 
-    <script>
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
+  <script>
+    // Prevent default touch behaviors on the document level for a better game experience.
+    // Note: The {passive: false} option is required for some browsers to allow preventDefault().
+    document.addEventListener("touchstart", function(e) {
+      e.preventDefault();
+    }, { passive: false });
 
-        const width = 400;
-        const height = 700;
-        canvas.width = width;
-        canvas.height = height;
+    document.addEventListener("touchmove", function(e) {
+      e.preventDefault();
+    }, { passive: false });
 
-        let character = { x: width / 2 - 25, y: height - 100, width: 100, height: 100, speed: 15 };
-        let money = [];
-        let score = 0;
-        let hearts = 5;
-        let gameStarted = false;
-        let gameOver = false;
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
 
-        const characterImg = new Image();
-        const moneyImg = new Image();
-        const backgroundImg = new Image();
-        const heartImg = new Image();
-        const coinSound = new Audio('assets/music/coin.mp3');
-        const loseHeartSound = new Audio('assets/music/lose_heart.mp3');
-        const gameMusic = new Audio('assets/music/game.mp3'); // Background music
-        const selectSound = new Audio('assets/music/select.mp3'); // Button click sound
+    const width = 400;
+    const height = 700;
+    canvas.width = width;
+    canvas.height = height;
 
-        characterImg.src = "https://i.imgur.com/GQG37yE.png";
-        moneyImg.src = "https://i.imgur.com/mfjRq67.png";
-        backgroundImg.src = "https://i.imgur.com/QmSwBTO.jpeg";
-        heartImg.src = "https://i.imgur.com/RG9rZ8j.png";
+    let character = { x: width / 2 - 25, y: height - 100, width: 100, height: 100, speed: 15 };
+    let money = [];
+    let score = 0;
+    let hearts = 5;
+    let gameStarted = false;
+    let gameOver = false;
 
-        gameMusic.loop = true; // Loop the background music
+    const characterImg = new Image();
+    const moneyImg = new Image();
+    const backgroundImg = new Image();
+    const heartImg = new Image();
+    const coinSound = new Audio('assets/music/coin.mp3');
+    const loseHeartSound = new Audio('assets/music/lose_heart.mp3');
+    const gameMusic = new Audio('assets/music/game.mp3'); // Background music
+    const selectSound = new Audio('assets/music/select.mp3'); // Button click sound
 
-        function spawnMoney() {
-            const x = Math.random() * (width - 50);
-            money.push({ x: x, y: -50, width: 50, height: 50 });
+    characterImg.src = "https://i.imgur.com/GQG37yE.png";
+    moneyImg.src = "https://i.imgur.com/mfjRq67.png";
+    backgroundImg.src = "https://i.imgur.com/QmSwBTO.jpeg";
+    heartImg.src = "https://i.imgur.com/RG9rZ8j.png";
+
+    gameMusic.loop = true; // Loop the background music
+
+    function spawnMoney() {
+      const x = Math.random() * (width - 50);
+      money.push({ x: x, y: -50, width: 50, height: 50 });
+    }
+
+    function drawBackground() {
+      ctx.drawImage(backgroundImg, 0, 0, width, height);
+    }
+
+    function drawCharacter() {
+      ctx.drawImage(characterImg, character.x, character.y, character.width, character.height);
+    }
+
+    function drawMoney() {
+      for (let i = 0; i < money.length; i++) {
+        ctx.drawImage(moneyImg, money[i].x, money[i].y, money[i].width, money[i].height);
+        money[i].y += 2 + score / 10; // Coins fall faster as the score increases
+      }
+    }
+
+    function drawHearts() {
+      for (let i = 0; i < hearts; i++) {
+        ctx.drawImage(heartImg, width - 50 * (i + 1), 10, 40, 40);
+      }
+    }
+
+    function updateScore() {
+      ctx.fillStyle = "black";
+      ctx.font = "bold 20px Arial";
+      ctx.fillText(`Score: ${score}`, 10, 30);
+    }
+
+    function showResult() {
+      ctx.fillStyle = "black";
+      ctx.font = "bold 40px Arial";
+      const resultText = `Baby I love you ${score}K =)))`;
+      const lines = wrapText(resultText, width - 40);
+
+      // Calculate the total height of the text
+      let totalTextHeight = lines.length * 30; // 30px per line of text
+
+      // Calculate the middle of the screen
+      const middleY = height / 2;
+
+      // Define custom spacing between text and buttons
+      const textToButtonSpacing = 10; // Adjust this value for more/less space
+
+      // Calculate the vertical offset for the text (top margin)
+      const topMargin = (height - totalTextHeight - 80 - textToButtonSpacing) / 2; // 80px for button height
+
+      // Calculate the button Y position below the text, with the custom spacing
+      const buttonYPosition = middleY + totalTextHeight / 2 + textToButtonSpacing;
+
+      // Draw the text centered
+      lines.forEach((line, index) => {
+        const textWidth = ctx.measureText(line).width;
+        const xPosition = (width - textWidth) / 2;
+        const yPosition = topMargin + (index * 60);
+        ctx.fillText(line, xPosition, yPosition);
+      });
+
+      // Position the buttons below the text
+      document.getElementById("buttons").style.top = `${buttonYPosition}px`;
+      document.getElementById("buttons").style.display = "flex"; // Show buttons
+    }
+
+    function wrapText(text, maxWidth) {
+      const words = text.split(' ');
+      const lines = [];
+      let currentLine = '';
+
+      words.forEach(word => {
+        const testLine = currentLine + word + ' ';
+        const testWidth = ctx.measureText(testLine).width;
+        if (testWidth > maxWidth && currentLine !== '') {
+          lines.push(currentLine);
+          currentLine = word + ' ';
+        } else {
+          currentLine = testLine;
         }
+      });
+      if (currentLine !== '') {
+        lines.push(currentLine);
+      }
+      return lines;
+    }
 
-        function drawBackground() {
-            ctx.drawImage(backgroundImg, 0, 0, width, height);
+    function checkCollisions() {
+      for (let i = 0; i < money.length; i++) {
+        if (money[i].y + money[i].height > character.y &&
+            money[i].x < character.x + character.width &&
+            money[i].x + money[i].width > character.x) {
+          score++;
+          coinSound.currentTime = 0;
+          coinSound.play();
+          money.splice(i, 1);
+          i--;
         }
+      }
+    }
 
-        function drawCharacter() {
-            ctx.drawImage(characterImg, character.x, character.y, character.width, character.height);
+    function gameLoop() {
+      if (gameOver) {
+        showResult();
+        document.getElementById("buttons").style.display = "flex";
+        return;
+      }
+
+      ctx.clearRect(0, 0, width, height);
+      drawBackground();
+      drawCharacter();
+      drawMoney();
+      updateScore();
+      drawHearts();
+      checkCollisions();
+
+      if (Math.random() < 0.02) spawnMoney();
+
+      for (let i = 0; i < money.length; i++) {
+        if (money[i].y > height) {
+          hearts--;
+          loseHeartSound.currentTime = 0;
+          loseHeartSound.play();
+          money.splice(i, 1);
+          i--;
         }
+      }
 
-        function drawMoney() {
-            for (let i = 0; i < money.length; i++) {
-                ctx.drawImage(moneyImg, money[i].x, money[i].y, money[i].width, money[i].height);
-                money[i].y += 2 + score / 10; // Coins fall faster as the score increases
-            }
+      if (hearts <= 0) {
+        gameOver = true;
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    function moveCharacter(event) {
+      if (event.key === "ArrowLeft" && character.x > 0) {
+        character.x -= character.speed;
+      }
+      if (event.key === "ArrowRight" && character.x < width - character.width) {
+        character.x += character.speed;
+      }
+    }
+
+    // New button event handlers for left and right movement
+    let moveCharacterLeft, moveCharacterRight;
+    document.getElementById("leftBtn").addEventListener("click", function(event) {
+      event.preventDefault();
+      if (character.x > 0) {
+        character.x -= character.speed;
+      }
+    });
+    document.getElementById("leftBtn").addEventListener("mousedown", function(event) {
+      event.preventDefault();
+      moveCharacterLeft = setInterval(function() {
+        if (character.x > 0) {
+          character.x -= character.speed;
         }
+      }, 100);
+    });
+    document.getElementById("leftBtn").addEventListener("mouseup", function() {
+      clearInterval(moveCharacterLeft);
+    });
+    // For touch devices: clear the interval when touch ends
+    document.getElementById("leftBtn").addEventListener("touchend", function() {
+      clearInterval(moveCharacterLeft);
+    });
 
-        function drawHearts() {
-            for (let i = 0; i < hearts; i++) {
-                ctx.drawImage(heartImg, width - 50 * (i + 1), 10, 40, 40);
-            }
+    document.getElementById("rightBtn").addEventListener("click", function(event) {
+      event.preventDefault();
+      if (character.x < width - character.width) {
+        character.x += character.speed;
+      }
+    });
+    document.getElementById("rightBtn").addEventListener("mousedown", function(event) {
+      event.preventDefault();
+      moveCharacterRight = setInterval(function() {
+        if (character.x < width - character.width) {
+          character.x += character.speed;
         }
+      }, 100);
+    });
+    document.getElementById("rightBtn").addEventListener("mouseup", function() {
+      clearInterval(moveCharacterRight);
+    });
+    // For touch devices: clear the interval when touch ends
+    document.getElementById("rightBtn").addEventListener("touchend", function() {
+      clearInterval(moveCharacterRight);
+    });
 
-        function updateScore() {
-            ctx.fillStyle = "black";
-            ctx.font = "bold 20px Arial";
+    function startGame() {
+      score = 0;
+      hearts = 5;
+      money = [];
+      gameStarted = true;
+      gameOver = false;
+      document.getElementById("buttons").style.display = "none";
+      gameMusic.play();
+      gameLoop();
+    }
 
-            ctx.fillText(`Score: ${score}`, 10, 30); // Fixed string interpolation
-        }
+    function stopGame() {
+      gameMusic.pause();
+      gameMusic.currentTime = 0;
+    }
 
-        function showResult() {
-            ctx.fillStyle = "black";
-            ctx.font = "bold 40px Arial";
-            const resultText = `Baby I love you ${score}K =)))`; // Fixed string interpolation
-            const lines = wrapText(resultText, width - 40); // Wrap text to fit the screen width
+    document.addEventListener("keydown", moveCharacter);
+    document.getElementById("restart").addEventListener("click", function() {
+      selectSound.play();
+      startGame();
+    });
+    document.getElementById("exit").addEventListener("click", function() {
+      selectSound.play();
+      stopGame();
+      setTimeout(() => {
+        window.location.href = "page.html";
+      }, 500);
+    });
 
-            // Calculate the total height of the text
-            let totalTextHeight = lines.length * 30; // 30px per line of text
-
-            // Calculate the middle of the screen
-            const middleY = height / 2;
-
-            // Define custom spacing between text and buttons
-            const textToButtonSpacing = 10; // Adjust this value for more/less space
-
-            // Calculate the vertical offset for the text (top margin)
-            const topMargin = (height - totalTextHeight - 80 - textToButtonSpacing) / 2; // 80px for button height
-
-            // Calculate the button Y position below the text, with the custom spacing
-            const buttonYPosition = middleY + totalTextHeight / 2 + textToButtonSpacing; // Adds spacing between text and buttons
-
-            // Draw the text centered
-            lines.forEach((line, index) => {
-                const textWidth = ctx.measureText(line).width;
-                const xPosition = (width - textWidth) / 2; // Center the text horizontally
-                const yPosition = topMargin + (index * 60); // Adjust the y-position
-                ctx.fillText(line, xPosition, yPosition);
-            });
-
-            // Position the buttons below the text
-            document.getElementById("buttons").style.top = `${buttonYPosition}px`;
-            document.getElementById("buttons").style.display = "flex"; // Show buttons
-        }
-
-        function wrapText(text, maxWidth) {
-            const words = text.split(' ');
-            const lines = [];
-            let currentLine = '';
-
-            words.forEach(word => {
-                const testLine = currentLine + word + ' ';
-                const testWidth = ctx.measureText(testLine).width;
-                if (testWidth > maxWidth && currentLine !== '') {
-                    lines.push(currentLine);
-                    currentLine = word + ' ';
-                } else {
-                    currentLine = testLine;
-                }
-            });
-            if (currentLine !== '') {
-                lines.push(currentLine);
-            }
-            return lines;
-        }
-
-        function checkCollisions() {
-            for (let i = 0; i < money.length; i++) {
-                if (money[i].y + money[i].height > character.y &&
-                    money[i].x < character.x + character.width &&
-                    money[i].x + money[i].width > character.x) {
-                    score++;
-                    coinSound.currentTime = 0;  // Restart the sound immediately
-                    coinSound.play();  // Play the coin sound
-                    money.splice(i, 1);  // Remove caught money
-                    i--; // Ensure we don't skip the next coin
-                }
-            }
-        }
-
-        function gameLoop() {
-            if (gameOver) {
-                showResult();
-                document.getElementById("buttons").style.display = "flex"; // Show the buttons when the game is over
-                return;
-            }
-
-            ctx.clearRect(0, 0, width, height);  // Clear the canvas
-
-            drawBackground();
-            drawCharacter();
-            drawMoney();
-            updateScore();
-            drawHearts();
-            checkCollisions();
-
-            if (Math.random() < 0.02) spawnMoney();
-
-            for (let i = 0; i < money.length; i++) {
-                if (money[i].y > height) {
-                    hearts--;
-                    loseHeartSound.currentTime = 0;  // Restart the sound immediately
-                    loseHeartSound.play();  // Play the heart loss sound
-                    money.splice(i, 1);  // Remove missed money
-                    i--;
-                }
-            }
-
-            if (hearts <= 0) {
-                gameOver = true;
-            }
-
-            requestAnimationFrame(gameLoop);
-        }
-
-        function moveCharacter(event) {
-            if (event.key === "ArrowLeft" && character.x > 0) {
-                character.x -= character.speed;
-            }
-            if (event.key === "ArrowRight" && character.x < width - character.width) {
-                character.x += character.speed;
-            }
-        }
-
-        /// New button event handlers for left and right movement
-        document.getElementById("leftBtn").addEventListener("click", function(event) {
-            event.preventDefault();  // Prevent default behavior
-            if (character.x > 0) {
-                character.x -= character.speed;
-            }
-        });
-
-        // Add event listeners for holding the button
-        document.getElementById("leftBtn").addEventListener("mousedown", function(event) {
-            event.preventDefault();  // Prevent default behavior
-            moveCharacterLeft = setInterval(function() {
-                if (character.x > 0) {
-                    character.x -= character.speed;
-                }
-            }, 100); // Move every 100ms while holding
-        });
-
-        document.getElementById("leftBtn").addEventListener("mouseup", function() {
-            clearInterval(moveCharacterLeft); // Stop moving when the button is released
-        });
-
-        document.getElementById("rightBtn").addEventListener("click", function(event) {
-            event.preventDefault();  // Prevent default behavior
-            if (character.x < width - character.width) {
-                character.x += character.speed;
-            }
-        });
-
-        // Add event listeners for holding the button
-        document.getElementById("rightBtn").addEventListener("mousedown", function(event) {
-            event.preventDefault();  // Prevent default behavior
-            moveCharacterRight = setInterval(function() {
-                if (character.x < width - character.width) {
-                    character.x += character.speed;
-                }
-            }, 100); // Move every 100ms while holding
-        });
-
-        document.getElementById("rightBtn").addEventListener("mouseup", function() {
-            clearInterval(moveCharacterRight); // Stop moving when the button is released
-        });
-
-        function startGame() {
-            score = 0;
-            hearts = 5;
-            money = [];
-            gameStarted = true;
-            gameOver = false;
-            document.getElementById("buttons").style.display = "none"; // Hide the buttons during gameplay
-            gameMusic.play(); // Start background music
-            gameLoop();
-        }
-
-        function stopGame() {
-            gameMusic.pause(); // Stop background music when game ends
-            gameMusic.currentTime = 0; // Reset the music to the beginning
-        }
-
-        document.addEventListener("keydown", moveCharacter);
-        document.getElementById("restart").addEventListener("click", function() {
-            selectSound.play(); // Play sound when button is clicked
-            startGame(); // Restart the game
-        });
-        document.getElementById("exit").addEventListener("click", function() {
-            selectSound.play(); // Play sound when button is clicked
-            stopGame(); // Stop the game music
-            setTimeout(() => {
-                window.location.href = "page.html"; // Redirect after sound plays
-            }, 500); // Small delay to let the sound play
-        });
-
-        // Start game on load
-        startGame();
-    </script>
+    // Start game on load
+    startGame();
+  </script>
 </body>
 </html>
