@@ -256,7 +256,7 @@
         if (character.x > 0) {
           character.x -= character.speed;
         }
-      }, 100); // Move every 100ms while holding
+      }, 300); // Move every 100ms while holding
     });
 
     document.getElementById("leftBtn").addEventListener("mouseup", function () {
@@ -275,7 +275,7 @@
         if (character.x < width - character.width) {
           character.x += character.speed;
         }
-      }, 100); // Move every 100ms while holding
+      }, 300); // Move every 100ms while holding
     });
 
     document.getElementById("rightBtn").addEventListener("mouseup", function () {
