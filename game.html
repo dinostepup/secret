@@ -33,6 +33,22 @@
             height: 150px;
             cursor: pointer;
         }
+        #leftBtn, #rightBtn {
+            position: fixed; /* Make sure the buttons are fixed to the viewport */
+            width: 120px;
+            height: 120px;
+            cursor: pointer;
+            bottom: 100px; /* Adjust the distance from the bottom */
+        }
+
+        #leftBtn {
+            left: 90px; /* Adjust the distance from the left */
+        }
+
+        #rightBtn {
+            right: 90px; /* Adjust the distance from the right */
+        }
+
     </style>
 </head>
 <body>
@@ -41,6 +57,9 @@
         <img id="restart" src="https://i.imgur.com/Ulh6dNe.png" alt="Restart">
         <img id="exit" src="https://i.imgur.com/9ih3oqp.png" alt="Exit">
     </div>
+    <!-- Added Left and Right Buttons -->
+    <img id="leftBtn" src="https://i.imgur.com/iAYThAE.png" alt="Move Left">
+    <img id="rightBtn" src="https://i.imgur.com/BHAtUSb.png" alt="Move Right">
 
     <script>
         const canvas = document.getElementById("gameCanvas");
@@ -219,6 +238,45 @@
                 character.x += character.speed;
             }
         }
+
+        /// New button event handlers for left and right movement
+        document.getElementById("leftBtn").addEventListener("click", function() {
+            if (character.x > 0) {
+                character.x -= character.speed;
+            }
+        });
+
+        // Add event listeners for holding the button
+        document.getElementById("leftBtn").addEventListener("mousedown", function() {
+            moveCharacterLeft = setInterval(function() {
+                if (character.x > 0) {
+                    character.x -= character.speed;
+                }
+            }, 100); // Move every 100ms while holding
+        });
+
+        document.getElementById("leftBtn").addEventListener("mouseup", function() {
+            clearInterval(moveCharacterLeft); // Stop moving when the button is released
+        });
+
+        document.getElementById("rightBtn").addEventListener("click", function() {
+            if (character.x < width - character.width) {
+                character.x += character.speed;
+            }
+        });
+
+        // Add event listeners for holding the button
+        document.getElementById("rightBtn").addEventListener("mousedown", function() {
+            moveCharacterRight = setInterval(function() {
+                if (character.x < width - character.width) {
+                    character.x += character.speed;
+                }
+            }, 100); // Move every 100ms while holding
+        });
+
+        document.getElementById("rightBtn").addEventListener("mouseup", function() {
+            clearInterval(moveCharacterRight); // Stop moving when the button is released
+        });
 
         function startGame() {
             score = 0;
