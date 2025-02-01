@@ -77,9 +77,27 @@
     let gameOver = false;
 
     // Declare movement interval variables
-    let moveCharacterLeft;
-    let moveCharacterRight;
+    let moveLeft = false;
+    let moveRight = false;
     
+    // Listen for keyboard events
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft" || event.key === "a") {
+        moveLeft = true;
+      } else if (event.key === "ArrowRight" || event.key === "d") {
+        moveRight = true;
+      }
+    });
+    
+    document.addEventListener("keyup", (event) => {
+      if (event.key === "ArrowLeft" || event.key === "a") {
+        moveLeft = false;
+      } else if (event.key === "ArrowRight" || event.key === "d") {
+        moveRight = false;
+      }
+    });
+    
+    // Mobile support for touch events
     document.getElementById("leftBtn").addEventListener("mousedown", startMovingLeft);
     document.getElementById("leftBtn").addEventListener("touchstart", startMovingLeft); // Mobile support
     document.getElementById("leftBtn").addEventListener("mouseup", stopMoving);
@@ -92,6 +110,7 @@
     document.getElementById("rightBtn").addEventListener("mouseleave", stopMoving);
     document.getElementById("rightBtn").addEventListener("touchend", stopMoving);
     
+    // Movement logic for mobile buttons
     function startMovingLeft() {
       stopMoving(); // Clear existing movement first
       moveCharacterLeft = setInterval(function () {
@@ -240,18 +259,26 @@
         document.getElementById("buttons").style.display = "flex"; // Show the buttons when the game is over
         return;
       }
-
+    
       ctx.clearRect(0, 0, width, height); // Clear the canvas
-
+    
       drawBackground();
       drawCharacter();
       drawMoney();
       updateScore();
       drawHearts();
       checkCollisions();
-
+    
       if (Math.random() < 0.02) spawnMoney();
-
+    
+      // Move character based on keyboard input
+      if (moveLeft && character.x > 0) {
+        character.x -= character.speed;
+      }
+      if (moveRight && character.x < width - character.width) {
+        character.x += character.speed;
+      }
+    
       for (let i = 0; i < money.length; i++) {
         if (money[i].y > height) {
           hearts--;
@@ -261,14 +288,13 @@
           i--;
         }
       }
-
+    
       if (hearts <= 0) {
         gameOver = true;
       }
-
+    
       requestAnimationFrame(gameLoop);
     }
-
     function startGame() {
       score = 0;
       hearts = 5;
