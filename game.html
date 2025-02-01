@@ -76,9 +76,35 @@
     let gameStarted = false;
     let gameOver = false;
 
-    // Declare interval variables for holding button presses
+    // Declare movement interval variables
     let moveCharacterLeft;
     let moveCharacterRight;
+    
+    // Left button event for holding down
+    document.getElementById("leftBtn").addEventListener("mousedown", function () {
+      moveCharacterLeft = setInterval(function () {
+        if (character.x > 0) {
+          character.x -= character.speed;
+        }
+      }, 300); // Move every 300ms while holding
+    });
+
+    document.getElementById("leftBtn").addEventListener("mouseup", function () {
+      clearInterval(moveCharacterLeft); // Stop moving when the button is released
+    });
+
+    // Right button event for holding down
+    document.getElementById("rightBtn").addEventListener("mousedown", function () {
+      moveCharacterRight = setInterval(function () {
+        if (character.x < width - character.width) {
+          character.x += character.speed;
+        }
+      }, 300); // Move every 300ms while holding
+    });
+
+    document.getElementById("rightBtn").addEventListener("mouseup", function () {
+      clearInterval(moveCharacterRight); // Stop moving when the button is released
+    });
 
     const characterImg = new Image();
     const moneyImg = new Image();
@@ -234,54 +260,6 @@
       requestAnimationFrame(gameLoop);
     }
 
-    function moveCharacter(event) {
-      if (event.key === "ArrowLeft" && character.x > 0) {
-        character.x -= character.speed;
-      }
-      if (event.key === "ArrowRight" && character.x < width - character.width) {
-        character.x += character.speed;
-      }
-    }
-
-    // New button event handlers for left and right movement
-    document.getElementById("leftBtn").addEventListener("click", function () {
-      if (character.x > 0) {
-        character.x -= character.speed;
-      }
-    });
-
-    // Add event listeners for holding the left button
-    document.getElementById("leftBtn").addEventListener("mousedown", function () {
-      moveCharacterLeft = setInterval(function () {
-        if (character.x > 0) {
-          character.x -= character.speed;
-        }
-      }, 300); // Move every 100ms while holding
-    });
-
-    document.getElementById("leftBtn").addEventListener("mouseup", function () {
-      clearInterval(moveCharacterLeft); // Stop moving when the button is released
-    });
-
-    document.getElementById("rightBtn").addEventListener("click", function () {
-      if (character.x < width - character.width) {
-        character.x += character.speed;
-      }
-    });
-
-    // Add event listeners for holding the right button
-    document.getElementById("rightBtn").addEventListener("mousedown", function () {
-      moveCharacterRight = setInterval(function () {
-        if (character.x < width - character.width) {
-          character.x += character.speed;
-        }
-      }, 300); // Move every 100ms while holding
-    });
-
-    document.getElementById("rightBtn").addEventListener("mouseup", function () {
-      clearInterval(moveCharacterRight); // Stop moving when the button is released
-    });
-
     function startGame() {
       score = 0;
       hearts = 5;
@@ -298,7 +276,6 @@
       gameMusic.currentTime = 0; // Reset the music to the beginning
     }
 
-    document.addEventListener("keydown", moveCharacter);
     document.getElementById("restart").addEventListener("click", function () {
       selectSound.play(); // Play sound when button is clicked
       startGame(); // Restart the game
