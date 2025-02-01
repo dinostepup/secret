@@ -17,6 +17,12 @@
       position: relative;
       /* Prevent default touch actions on the body */
       touch-action: none;
+    <script>
+        // Prevent the default behavior of long-pressing on the images
+        document.addEventListener('contextmenu', function(event) {
+            event.preventDefault();
+        });
+    </script>
     }
     canvas {
       border: 2px solid white;
