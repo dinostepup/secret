@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Catch me if you can!</title>
   <style>
     body {
@@ -15,19 +15,9 @@
       height: 100vh;
       overflow: hidden;
       position: relative;
-      /* Prevent default touch actions on the body */
-      touch-action: none;
-    <script>
-        // Prevent the default behavior of long-pressing on the images
-        document.addEventListener('contextmenu', function(event) {
-            event.preventDefault();
-        });
-    </script>
     }
     canvas {
       border: 2px solid white;
-      /* Disable gestures on the canvas */
-      touch-action: none;
     }
     #buttons {
       position: absolute;
@@ -38,12 +28,14 @@
       z-index: 10;
       margin-top: 20px; /* Adjust this if needed */
     }
-    #restart, #exit {
+    #restart,
+    #exit {
       width: 150px; /* Adjust the size */
       height: 150px;
       cursor: pointer;
     }
-    #leftBtn, #rightBtn {
+    #leftBtn,
+    #rightBtn {
       position: fixed; /* Make sure the buttons are fixed to the viewport */
       width: 120px;
       height: 120px;
@@ -61,24 +53,14 @@
 <body>
   <canvas id="gameCanvas"></canvas>
   <div id="buttons">
-    <img id="restart" src="https://i.imgur.com/Ulh6dNe.png" alt="Restart">
-    <img id="exit" src="https://i.imgur.com/9ih3oqp.png" alt="Exit">
+    <img id="restart" src="https://i.imgur.com/Ulh6dNe.png" alt="Restart" />
+    <img id="exit" src="https://i.imgur.com/9ih3oqp.png" alt="Exit" />
   </div>
   <!-- Added Left and Right Buttons -->
-  <img id="leftBtn" src="https://i.imgur.com/iAYThAE.png" alt="Move Left">
-  <img id="rightBtn" src="https://i.imgur.com/BHAtUSb.png" alt="Move Right">
+  <img id="leftBtn" src="https://i.imgur.com/iAYThAE.png" alt="Move Left" />
+  <img id="rightBtn" src="https://i.imgur.com/BHAtUSb.png" alt="Move Right" />
 
   <script>
-    // Prevent default touch behaviors on the document level for a better game experience.
-    // Note: The {passive: false} option is required for some browsers to allow preventDefault().
-    document.addEventListener("touchstart", function(e) {
-      e.preventDefault();
-    }, { passive: false });
-
-    document.addEventListener("touchmove", function(e) {
-      e.preventDefault();
-    }, { passive: false });
-
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
@@ -94,14 +76,18 @@
     let gameStarted = false;
     let gameOver = false;
 
+    // Declare interval variables for holding button presses
+    let moveCharacterLeft;
+    let moveCharacterRight;
+
     const characterImg = new Image();
     const moneyImg = new Image();
     const backgroundImg = new Image();
     const heartImg = new Image();
-    const coinSound = new Audio('assets/music/coin.mp3');
-    const loseHeartSound = new Audio('assets/music/lose_heart.mp3');
-    const gameMusic = new Audio('assets/music/game.mp3'); // Background music
-    const selectSound = new Audio('assets/music/select.mp3'); // Button click sound
+    const coinSound = new Audio("assets/music/coin.mp3");
+    const loseHeartSound = new Audio("assets/music/lose_heart.mp3");
+    const gameMusic = new Audio("assets/music/game.mp3"); // Background music
+    const selectSound = new Audio("assets/music/select.mp3"); // Button click sound
 
     characterImg.src = "https://i.imgur.com/GQG37yE.png";
     moneyImg.src = "https://i.imgur.com/mfjRq67.png";
@@ -146,7 +132,7 @@
       ctx.fillStyle = "black";
       ctx.font = "bold 40px Arial";
       const resultText = `Baby I love you ${score}K =)))`;
-      const lines = wrapText(resultText, width - 40);
+      const lines = wrapText(resultText, width - 40); // Wrap text to fit the screen width
 
       // Calculate the total height of the text
       let totalTextHeight = lines.length * 30; // 30px per line of text
@@ -161,13 +147,13 @@
       const topMargin = (height - totalTextHeight - 80 - textToButtonSpacing) / 2; // 80px for button height
 
       // Calculate the button Y position below the text, with the custom spacing
-      const buttonYPosition = middleY + totalTextHeight / 2 + textToButtonSpacing;
+      const buttonYPosition = middleY + totalTextHeight / 2 + textToButtonSpacing; // Adds spacing between text and buttons
 
       // Draw the text centered
       lines.forEach((line, index) => {
         const textWidth = ctx.measureText(line).width;
-        const xPosition = (width - textWidth) / 2;
-        const yPosition = topMargin + (index * 60);
+        const xPosition = (width - textWidth) / 2; // Center the text horizontally
+        const yPosition = topMargin + index * 60; // Adjust the y-position
         ctx.fillText(line, xPosition, yPosition);
       });
 
@@ -177,21 +163,21 @@
     }
 
     function wrapText(text, maxWidth) {
-      const words = text.split(' ');
+      const words = text.split(" ");
       const lines = [];
-      let currentLine = '';
+      let currentLine = "";
 
       words.forEach(word => {
-        const testLine = currentLine + word + ' ';
+        const testLine = currentLine + word + " ";
         const testWidth = ctx.measureText(testLine).width;
-        if (testWidth > maxWidth && currentLine !== '') {
+        if (testWidth > maxWidth && currentLine !== "") {
           lines.push(currentLine);
-          currentLine = word + ' ';
+          currentLine = word + " ";
         } else {
           currentLine = testLine;
         }
       });
-      if (currentLine !== '') {
+      if (currentLine !== "") {
         lines.push(currentLine);
       }
       return lines;
@@ -199,14 +185,16 @@
 
     function checkCollisions() {
       for (let i = 0; i < money.length; i++) {
-        if (money[i].y + money[i].height > character.y &&
-            money[i].x < character.x + character.width &&
-            money[i].x + money[i].width > character.x) {
+        if (
+          money[i].y + money[i].height > character.y &&
+          money[i].x < character.x + character.width &&
+          money[i].x + money[i].width > character.x
+        ) {
           score++;
-          coinSound.currentTime = 0;
-          coinSound.play();
-          money.splice(i, 1);
-          i--;
+          coinSound.currentTime = 0; // Restart the sound immediately
+          coinSound.play(); // Play the coin sound
+          money.splice(i, 1); // Remove caught money
+          i--; // Ensure we don't skip the next coin
         }
       }
     }
@@ -214,11 +202,12 @@
     function gameLoop() {
       if (gameOver) {
         showResult();
-        document.getElementById("buttons").style.display = "flex";
+        document.getElementById("buttons").style.display = "flex"; // Show the buttons when the game is over
         return;
       }
 
-      ctx.clearRect(0, 0, width, height);
+      ctx.clearRect(0, 0, width, height); // Clear the canvas
+
       drawBackground();
       drawCharacter();
       drawMoney();
@@ -231,9 +220,9 @@
       for (let i = 0; i < money.length; i++) {
         if (money[i].y > height) {
           hearts--;
-          loseHeartSound.currentTime = 0;
-          loseHeartSound.play();
-          money.splice(i, 1);
+          loseHeartSound.currentTime = 0; // Restart the sound immediately
+          loseHeartSound.play(); // Play the heart loss sound
+          money.splice(i, 1); // Remove missed money
           i--;
         }
       }
@@ -255,49 +244,42 @@
     }
 
     // New button event handlers for left and right movement
-    let moveCharacterLeft, moveCharacterRight;
-    document.getElementById("leftBtn").addEventListener("click", function(event) {
-      event.preventDefault();
+    document.getElementById("leftBtn").addEventListener("click", function () {
       if (character.x > 0) {
         character.x -= character.speed;
       }
     });
-    document.getElementById("leftBtn").addEventListener("mousedown", function(event) {
-      event.preventDefault();
-      moveCharacterLeft = setInterval(function() {
+
+    // Add event listeners for holding the left button
+    document.getElementById("leftBtn").addEventListener("mousedown", function () {
+      moveCharacterLeft = setInterval(function () {
         if (character.x > 0) {
           character.x -= character.speed;
         }
-      }, 100);
-    });
-    document.getElementById("leftBtn").addEventListener("mouseup", function() {
-      clearInterval(moveCharacterLeft);
-    });
-    // For touch devices: clear the interval when touch ends
-    document.getElementById("leftBtn").addEventListener("touchend", function() {
-      clearInterval(moveCharacterLeft);
+      }, 100); // Move every 100ms while holding
     });
 
-    document.getElementById("rightBtn").addEventListener("click", function(event) {
-      event.preventDefault();
+    document.getElementById("leftBtn").addEventListener("mouseup", function () {
+      clearInterval(moveCharacterLeft); // Stop moving when the button is released
+    });
+
+    document.getElementById("rightBtn").addEventListener("click", function () {
       if (character.x < width - character.width) {
         character.x += character.speed;
       }
     });
-    document.getElementById("rightBtn").addEventListener("mousedown", function(event) {
-      event.preventDefault();
-      moveCharacterRight = setInterval(function() {
+
+    // Add event listeners for holding the right button
+    document.getElementById("rightBtn").addEventListener("mousedown", function () {
+      moveCharacterRight = setInterval(function () {
         if (character.x < width - character.width) {
           character.x += character.speed;
         }
-      }, 100);
+      }, 100); // Move every 100ms while holding
     });
-    document.getElementById("rightBtn").addEventListener("mouseup", function() {
-      clearInterval(moveCharacterRight);
-    });
-    // For touch devices: clear the interval when touch ends
-    document.getElementById("rightBtn").addEventListener("touchend", function() {
-      clearInterval(moveCharacterRight);
+
+    document.getElementById("rightBtn").addEventListener("mouseup", function () {
+      clearInterval(moveCharacterRight); // Stop moving when the button is released
     });
 
     function startGame() {
@@ -306,27 +288,27 @@
       money = [];
       gameStarted = true;
       gameOver = false;
-      document.getElementById("buttons").style.display = "none";
-      gameMusic.play();
+      document.getElementById("buttons").style.display = "none"; // Hide the buttons during gameplay
+      gameMusic.play(); // Start background music
       gameLoop();
     }
 
     function stopGame() {
-      gameMusic.pause();
-      gameMusic.currentTime = 0;
+      gameMusic.pause(); // Stop background music when game ends
+      gameMusic.currentTime = 0; // Reset the music to the beginning
     }
 
     document.addEventListener("keydown", moveCharacter);
-    document.getElementById("restart").addEventListener("click", function() {
-      selectSound.play();
-      startGame();
+    document.getElementById("restart").addEventListener("click", function () {
+      selectSound.play(); // Play sound when button is clicked
+      startGame(); // Restart the game
     });
-    document.getElementById("exit").addEventListener("click", function() {
-      selectSound.play();
-      stopGame();
+    document.getElementById("exit").addEventListener("click", function () {
+      selectSound.play(); // Play sound when button is clicked
+      stopGame(); // Stop the game music
       setTimeout(() => {
-        window.location.href = "page.html";
-      }, 500);
+        window.location.href = "page.html"; // Redirect after sound plays
+      }, 500); // Small delay to let the sound play
     });
 
     // Start game on load
