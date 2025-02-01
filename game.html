@@ -112,7 +112,7 @@
     function drawMoney() {
       for (let i = 0; i < money.length; i++) {
         ctx.drawImage(moneyImg, money[i].x, money[i].y, money[i].width, money[i].height);
-        money[i].y += 2 + score / 10; // Coins fall faster as the score increases
+        money[i].y += 3 + score / 10; // Coins fall faster as the score increases
       }
     }
 
